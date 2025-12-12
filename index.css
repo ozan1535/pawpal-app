@@ -1,0 +1,44 @@
+@import "tailwindcss";
+@import "@fontsource/fredoka-one";
+@import "@fontsource/baloo-2";
+@import "@fontsource/nunito";
+@import "@fontsource/quicksand";
+
+@layer base {
+  body {
+    @apply bg-background text-gray-800 font-sans antialiased transition-colors duration-300;
+  }
+
+  .dark body {
+    @apply bg-slate-900 text-white;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-white font-bold py-3 px-6 rounded-squircle shadow-button transition-all transform active:translate-y-1 active:shadow-button-active;
+  }
+  
+  .card {
+    @apply bg-white dark:bg-slate-800 rounded-squircle shadow-soft p-6 border border-gray-100 dark:border-slate-700 transition-colors duration-300;
+  }
+
+  input, textarea, select {
+    @apply bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-200 dark:bg-slate-700 rounded-full;
+  }
+}

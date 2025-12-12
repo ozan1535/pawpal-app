@@ -1,0 +1,7 @@
+{
+  "name": "Copy of Copy of BACKUP PawPal",
+  "description": "BACKUP PAWPAL",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
