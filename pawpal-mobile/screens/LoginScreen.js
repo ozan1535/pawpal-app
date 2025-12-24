@@ -369,7 +369,6 @@ export default function LoginScreen() {
         <Text style={styles.title}>
           {isSignUp ? "Hesap oluşturun" : "Hoşgeldiniz"}
         </Text>
-
         <TextInput
           style={styles.input}
           placeholder="Email"
@@ -379,7 +378,6 @@ export default function LoginScreen() {
           keyboardType="email-address"
           autoComplete="email"
         />
-
         <TextInput
           style={styles.input}
           placeholder="Parola"
@@ -389,7 +387,6 @@ export default function LoginScreen() {
           autoCapitalize="none"
           autoComplete="password"
         />
-
         <TouchableOpacity
           style={styles.primaryButton}
           onPress={handleEmailAuth}
@@ -399,7 +396,6 @@ export default function LoginScreen() {
             {isSignUp ? "Üye ol" : "Giriş Yap"}
           </Text>
         </TouchableOpacity>
-
         <TouchableOpacity
           style={styles.secondaryButton}
           onPress={() => setIsSignUp(!isSignUp)}
@@ -410,8 +406,7 @@ export default function LoginScreen() {
               : "Hesabınız yok mu? Kayıt Olun"}
           </Text>
         </TouchableOpacity>
-
-        <View style={styles.divider}>
+        {/* <View style={styles.divider}>
           <View style={styles.dividerLine} />
           <Text style={styles.dividerText}>YA DA</Text>
           <View style={styles.dividerLine} />
@@ -423,7 +418,7 @@ export default function LoginScreen() {
           disabled={loading}
         >
           <Text style={styles.googleButtonText}>Google ile devam edin</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </KeyboardAvoidingView>
   );
