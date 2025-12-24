@@ -180,28 +180,18 @@ export default function WebViewScreen() {
     };
   }, [session?.user?.id]);
 
-  // const handleLogout = () => {
-  //   Alert.alert("Logout", "Are you sure you want to logout?", [
-  //     { text: "Cancel", style: "cancel" },
-  //     {
-  //       text: "Logout",
-  //       style: "destructive",
-  //       onPress: async () => {
-  //         try {
-  //           await signOut();
-  //         } catch (error) {
-  //           Alert.alert("Error", error.message);
-  //         }
-  //       },
-  //     },
-  //   ]);
-  // };
-
   const handleLogout = async () => {
     try {
-      console.log("hhhehehe");
       await signOut();
+
+      webViewRef.current?.injectJavaScript(`
+        localStorage.removeItem("supabase_access_token");
+        localStorage.removeItem("supabase_refresh_token");
+        localStorage.removeItem("supabase_user");
+        true;
+      `);
     } catch (error) {
+      console.error("❌ Logout error:", error);
       Alert.alert("Error", error.message);
     }
   };

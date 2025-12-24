@@ -68,44 +68,22 @@ export const ProfileScreen: React.FC = () => {
     }, 2000);
   };
 
-  // const logoutFromMobile = (e) => {
-  //   e.preventDefault();
-  //   localStorage.removeItem("supabase_access_token");
-  //   localStorage.removeItem("supabase_refresh_token");
-  //   localStorage.removeItem("supabase_user");
-
-  //   supabase.auth.signOut();
-
-  //   if (window.ReactNativeWebView) {
-  //     window.ReactNativeWebView.postMessage(
-  //       JSON.stringify({
-  //         type: "logout",
-  //       })
-  //     );
-  //   }
-  // };
-
   const logoutFromMobile = (e) => {
     e.preventDefault();
-
-    console.log("🔴 Logout clicked");
-    console.log("🔴 ReactNativeWebView exists:", !!window.ReactNativeWebView);
 
     localStorage.removeItem("supabase_access_token");
     localStorage.removeItem("supabase_refresh_token");
     localStorage.removeItem("supabase_user");
 
-    supabase.auth.signOut();
-
     if (window.ReactNativeWebView) {
-      console.log("🔴 Sending logout message to mobile");
       window.ReactNativeWebView.postMessage(
         JSON.stringify({
           type: "logout",
         })
       );
     } else {
-      console.log("🔴 No ReactNativeWebView found - running in browser");
+      supabase.auth.signOut();
+      window.location.href = "/";
     }
   };
 
