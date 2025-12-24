@@ -1,7 +1,7 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/Button';
-import { PawPrint } from 'lucide-react';
+import React from "react";
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/Button";
+import { PawPrint } from "lucide-react";
 
 interface WelcomeScreenProps {
   onNavigate: (screen: string) => void;
@@ -24,7 +24,6 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onNavigate }) => {
 
       {/* Content Container */}
       <div className="flex-1 flex flex-col items-center justify-center p-8 relative z-10">
-
         {/* Logo / Mascot Area */}
         <motion.div
           initial={{ scale: 0, rotate: -180 }}
@@ -74,24 +73,30 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onNavigate }) => {
             variant="primary"
             size="lg"
             fullWidth
-            onClick={() => onNavigate('PET_WIZARD')}
+            onClick={() => onNavigate("PET_WIZARD")}
             className="text-xl"
           >
             Hikayeye Başla 📖
           </Button>
 
-          <div className="grid grid-cols-2 gap-4">
-            <Button variant="outline" onClick={() => { }}>
+          {/* <div className="grid grid-cols-2 gap-4">
+            <Button variant="outline" onClick={() => {}}>
               🍎 Apple
             </Button>
-            <Button variant="outline" onClick={() => { }}>
+            <Button variant="outline" onClick={() => {}}>
               G Google
             </Button>
-          </div>
+          </div> */}
 
-          <p className="text-center text-gray-400 dark:text-gray-500 font-bold text-sm mt-4 transition-colors duration-300">
-            Zaten üye misin? <button onClick={() => onNavigate('DASHBOARD')} className="text-primary hover:underline">Giriş Yap</button>
-          </p>
+          {/* <p className="text-center text-gray-400 dark:text-gray-500 font-bold text-sm mt-4 transition-colors duration-300">
+            Zaten üye misin?{" "}
+            <button
+              onClick={() => onNavigate("DASHBOARD")}
+              className="text-primary hover:underline"
+            >
+              Giriş Yap
+            </button>
+          </p> */}
         </motion.div>
       </div>
     </div>

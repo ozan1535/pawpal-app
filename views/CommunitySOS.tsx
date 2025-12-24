@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { MapPin, Users, Calendar, Plus, AlertCircle } from 'lucide-react';
-import { MOCK_EVENTS } from '../constants';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { MapPin, Users, Calendar, Plus, AlertCircle } from "lucide-react";
+import { MOCK_EVENTS } from "../constants";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Link } from "react-router-dom";
 
 interface CommunitySOSProps {
   onNavigate: (screen: string, params?: any) => void;
@@ -11,11 +12,14 @@ interface CommunitySOSProps {
 
 export const CommunitySOS: React.FC<CommunitySOSProps> = ({ onNavigate }) => {
   const [isPressing, setIsPressing] = useState(false);
+  const MotionLink = motion(Link);
 
   return (
     <div className="flex flex-col space-y-8 pb-24 min-h-full">
       <div className="pt-8 px-6 flex justify-between items-center">
-        <h1 className="text-3xl font-heading text-primary">Topluluk & SOS 🚨</h1>
+        <h1 className="text-3xl font-heading text-primary">
+          Topluluk & SOS 🚨
+        </h1>
       </div>
 
       {/* SOS Button Area */}
@@ -23,19 +27,26 @@ export const CommunitySOS: React.FC<CommunitySOSProps> = ({ onNavigate }) => {
         <Card className="bg-red-100 dark:bg-red-900/40 border-4 border-red-200 dark:border-red-800 text-center relative overflow-hidden p-8">
           <div className="absolute top-0 left-0 w-full h-2 bg-stripes-red opacity-20"></div>
 
-          <h2 className="text-2xl font-heading text-red-500 dark:text-red-400 mb-2">Acil Durum!</h2>
-          <p className="text-gray-500 dark:text-gray-400 mb-8 font-bold">Bir sorun mu var? Hemen yardım çağır!</p>
+          <h2 className="text-2xl font-heading text-red-500 dark:text-red-400 mb-2">
+            Acil Durum!
+          </h2>
+          <p className="text-gray-500 dark:text-gray-400 mb-8 font-bold">
+            Bir sorun mu var? Hemen yardım çağır!
+          </p>
 
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            onTapStart={() => setIsPressing(true)}
-            onTapEnd={() => setIsPressing(false)}
-            onClick={() => onNavigate('SOS_FORM')}
-            className="w-40 h-40 rounded-full bg-red-500 border-b-8 border-red-700 shadow-xl flex items-center justify-center relative mx-auto group"
-          >
-            <div className="absolute inset-0 rounded-full bg-white opacity-20 animate-ping" />
-            <span className="text-4xl font-black text-white">SOS</span>
-          </motion.button>
+          <Link to="/lost-form">
+            <MotionLink
+              whileTap={{ scale: 0.9 }}
+              onTapStart={() => setIsPressing(true)}
+              onTapEnd={() => setIsPressing(false)}
+              to="/lost-form"
+              //onClick={() => onNavigate("lost-form SOS_FORM")}
+              className="w-40 h-40 rounded-full bg-red-500 border-b-8 border-red-700 shadow-xl flex items-center justify-center relative mx-auto group"
+            >
+              <div className="absolute inset-0 rounded-full bg-white opacity-20 animate-ping" />
+              <span className="text-4xl font-black text-white">SOS</span>
+            </MotionLink>
+          </Link>
 
           {isPressing && (
             <motion.div
@@ -50,7 +61,7 @@ export const CommunitySOS: React.FC<CommunitySOSProps> = ({ onNavigate }) => {
       </div>
 
       {/* Immersive Events */}
-      <div className="px-6">
+      {/* <div className="px-6">
         <div className="flex justify-between items-center mb-4">
           <h3 className="font-heading text-xl text-gray-700 dark:text-gray-200">Etkinlikler</h3>
           <Button
@@ -93,7 +104,7 @@ export const CommunitySOS: React.FC<CommunitySOSProps> = ({ onNavigate }) => {
             </motion.div>
           ))}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

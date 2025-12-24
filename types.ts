@@ -1,7 +1,6 @@
-
 export enum UserMode {
-  OWNER = 'OWNER',
-  WALKER = 'WALKER'
+  OWNER = "OWNER",
+  WALKER = "WALKER",
 }
 
 export interface TrainingModule {
@@ -39,12 +38,12 @@ export interface Pet {
 
 export interface PetDraft {
   name: string;
-  type: 'dog' | 'cat';
+  type: "dog" | "cat";
   breed: string;
-  gender: 'male' | 'female';
+  gender: "male" | "female";
   birthday: string;
   weight: string;
-  weightUnit: 'kg' | 'lbs';
+  weightUnit: "kg" | "lbs";
   isNeutered: boolean;
   photoUrl: string | null;
   // New fields for Onboarding Update
@@ -67,7 +66,7 @@ export interface HealthRecord {
 
 export interface ChatMessage {
   id: string;
-  role: 'user' | 'model';
+  role: "user" | "model";
   text: string;
   image?: string;
   isThinking?: boolean;
@@ -104,7 +103,7 @@ export interface LostPet {
   lastSeen: string;
   ownerContact: string;
   // New fields for Lost & Found Upgrade
-  status: 'ACTIVE' | 'FOUND' | 'ARCHIVED';
+  status: "ACTIVE" | "FOUND" | "ARCHIVED";
   ownerId: string;
   details: {
     collar: string;
@@ -131,3 +130,23 @@ export interface UserProfile {
   photoUrl: string;
   isPremium: boolean;
 }
+
+export type ViewState =
+  | "WELCOME"
+  | "PET_WIZARD"
+  | "ONBOARDING_SUCCESS"
+  | "DASHBOARD"
+  | "HEALTH"
+  | "ACADEMY"
+  | "COMMUNITY"
+  | "PROFILE"
+  | "SCREEN_VACCINE"
+  | "SCREEN_WEIGHT"
+  | "SCREEN_BOOKING"
+  | "LESSON_DETAIL"
+  | "SOS_FORM"
+  | "SOS_BROADCAST"
+  | "EVENT_DETAIL"
+  | "CREATE_EVENT"
+  | "EMERGENCY_MAP"
+  | "LOST_PETS_FEED";

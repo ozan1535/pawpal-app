@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "PawPal",
+    "slug": "pawpal",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/pawpal-icon.png",
+    "userInterfaceStyle": "light",
+    "scheme": "myapp",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/pawpal-splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.mobile.pawpal"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/pawpal-adaptive.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "package": "com.mobile.pawpal"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": ["expo-web-browser", "expo-notifications"],
+    "extra": {
+      "eas": {
+        "projectId": "caa38754-ecb6-48a5-bb5d-6a2d993241e5"
+      }
+    },
+    "owner": "gowhap"
+  }
+}

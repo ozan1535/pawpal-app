@@ -1,46 +1,120 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Camera, Dog, Cat, ChevronRight, Calendar, User, Scale, HelpCircle, BookOpen, QrCode, Radio } from 'lucide-react';
-import { PetDraft } from '../../types';
-import { DOG_BREEDS, CAT_BREEDS } from '../../constants';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  ArrowLeft,
+  Camera,
+  Dog,
+  Cat,
+  ChevronRight,
+  Calendar,
+  User,
+  Scale,
+  HelpCircle,
+  BookOpen,
+  QrCode,
+  Radio,
+} from "lucide-react";
+import { PetDraft } from "../../types";
+import { DOG_BREEDS, CAT_BREEDS } from "../../constants";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import {
+  addNewUserDetail,
+  getCurrentUser,
+} from "@/services/supabase/user_details.service";
+import ImageUpload from "@/components/ImageUpload";
+import { addNewPet } from "@/services/supabase/pets.service";
+import { addNewPetWeight } from "@/services/supabase/pet_weights.service";
+import SelectComponent from "@/components/SelectComponent";
+import { cities } from "@/lib/cityInformation";
 
 interface PetWizardProps {
   onComplete: () => void;
 }
 
-export const PetWizard: React.FC<PetWizardProps> = ({ onComplete }) => {
-  const [step, setStep] = useState(1);
+export const PetWizard: React.FC<PetWizardProps> = ({
+  onComplete,
+  hasUser = false,
+}) => {
+  const [step, setStep] = useState(hasUser ? 2 : 1);
   const [direction, setDirection] = useState(0);
   const [petData, setPetData] = useState<PetDraft>({
-    ownerName: '',
-    ownerRole: 'Parent',
-    name: '',
-    type: 'dog',
-    breed: '',
-    gender: 'male',
-    birthday: '',
+    ownerName: "",
+    ownerRole: "Parent",
+    name: "",
+    type: "dog",
+    breed: "",
+    gender: "male",
+    birthday: "",
     estimatedAge: { years: 0, months: 0 },
-    weight: '',
-    weightUnit: 'kg',
+    weight: "",
+    weightUnit: "kg",
     isNeutered: false,
-    photoUrl: null
+    photoUrl: null,
   });
   const [useEstimatedAge, setUseEstimatedAge] = useState(false);
-
+  const [city, setCity] = useState("");
+  const [selectedDistrict, setSelectedDistrict] = useState("");
+  const [districts, setDistricts] = useState(null);
   const totalSteps = 4;
 
+  const handleFetchDistricts = async (selectedItem) => {
+    const response = await fetch(
+      `https://api.turkiyeapi.dev/v1/provinces?name=${selectedItem}`
+    );
+    const data = await response.json();
+
+    setSelectedDistrict("");
+    setDistricts(data.data[0].districts);
+  };
+
+  const handleAddUserDetail = async () => {
+    const user = await getCurrentUser();
+    await addNewUserDetail(
+      user.id,
+      petData.ownerName,
+      petData.ownerRole,
+      city,
+      selectedDistrict
+    );
+  };
+  const handleAddPetAndWeight = async () => {
+    const user = await getCurrentUser();
+    const pet = await addNewPet(
+      user.id,
+      petData.name,
+      petData.breed,
+      petData.type,
+      petData.birthday,
+      petData.gender,
+      petData.photoUrl
+    );
+    // console.log(pet, "bu bir evcil hayvandir");
+    await addNewPetWeight(pet.id, petData.weight);
+  };
+
   const handleNext = () => {
-    // Validation logic (simplified for brevity, can be expanded)
-    if (step === 1 && (!petData.ownerName || !petData.ownerRole)) return alert("Lütfen hikayeyi tamamlayın!");
-    if (step === 2 && (!petData.name || !petData.breed)) return alert("Kahramanımızın adı ne?");
-    if (step === 3 && !petData.weight) return alert("Ne kadar güçlü olduğunu yazın!");
+    if (step === 1 && (!petData.ownerName || !petData.ownerRole)) {
+      return alert("Lütfen hikayeyi tamamlayın!");
+    }
+    if (step === 2 && (!petData.name || !petData.breed))
+      return alert("Kahramanımızın adı ne?");
+    if (step === 3 && !petData.weight) {
+      return alert("Ne kadar güçlü olduğunu yazın!");
+    }
     // Step 4 is optional
+
+    if (step === 1) {
+      handleAddUserDetail();
+    }
+
+    if (step === 3) {
+      handleAddPetAndWeight();
+    }
 
     if (step < totalSteps) {
       setDirection(1);
-      setStep(s => s + 1);
+      setStep((s) => s + 1);
     } else {
       onComplete();
     }
@@ -49,7 +123,7 @@ export const PetWizard: React.FC<PetWizardProps> = ({ onComplete }) => {
   const handleBack = () => {
     if (step > 1) {
       setDirection(-1);
-      setStep(s => s - 1);
+      setStep((s) => s - 1);
     }
   };
 
@@ -76,43 +150,77 @@ export const PetWizard: React.FC<PetWizardProps> = ({ onComplete }) => {
   const renderStep1 = () => (
     <div className="space-y-6">
       <div className="text-center space-y-2">
-        <h2 className="text-3xl font-heading text-primary">Bölüm 1: Başlangıç</h2>
-        <p className="text-xl font-medium text-gray-600 dark:text-gray-300 transition-colors duration-300">Bir zamanlar...</p>
+        <h2 className="text-3xl font-heading text-primary">
+          Bölüm 1: Başlangıç
+        </h2>
+        <p className="text-xl font-medium text-gray-600 dark:text-gray-300 transition-colors duration-300">
+          Bir zamanlar...
+        </p>
       </div>
 
       <Card className="space-y-6 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-2 border-orange-100 dark:border-slate-700 transition-colors duration-300">
         <div className="space-y-2">
-          <label className="text-lg font-bold text-gray-700 dark:text-gray-200 block transition-colors duration-300">...bu hikayeyi yazan bir kahraman vardı.</label>
+          <label className="text-lg font-bold text-gray-700 dark:text-gray-200 block transition-colors duration-300">
+            ...bu hikayeyi yazan bir kahraman vardı.
+          </label>
           <div className="relative">
             <User className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary w-6 h-6" />
             <input
               type="text"
               value={petData.ownerName}
-              onChange={(e) => setPetData({ ...petData, ownerName: e.target.value })}
+              onChange={(e) =>
+                setPetData({ ...petData, ownerName: e.target.value })
+              }
               placeholder="Adınız..."
               className="w-full pl-12 p-4 bg-background dark:bg-slate-900 rounded-xl border-2 border-orange-200 dark:border-slate-600 font-bold text-gray-800 dark:text-white outline-none focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all placeholder:text-gray-400"
               autoFocus
             />
           </div>
+          <div className="relative w-full flex gap-3">
+            <div className="w-1/2">
+              <SelectComponent
+                selectedItem={city}
+                setSelectedItem={setCity}
+                data={cities}
+                label={"Yaşadığınız şehir"}
+                disabledValue={"Şehir Seçiniz"}
+                handleFetch={handleFetchDistricts}
+              />
+            </div>
+            <div className="w-1/2">
+              <SelectComponent
+                selectedItem={selectedDistrict}
+                setSelectedItem={setSelectedDistrict}
+                data={districts}
+                label={"Yaşadığınız ilçe"}
+                disabledValue={"İlçe Seçiniz"}
+              />
+            </div>
+          </div>
         </div>
 
         <div className="space-y-2">
-          <label className="text-lg font-bold text-gray-700 dark:text-gray-200 block transition-colors duration-300">O, tüylü dostunun...</label>
+          <label className="text-lg font-bold text-gray-700 dark:text-gray-200 block transition-colors duration-300">
+            O, tüylü dostunun...
+          </label>
           <div className="flex flex-wrap gap-3">
-            {['Annesi', 'Babası', 'Arkadaşı', 'Sırdaşı'].map((role) => (
+            {["Annesi", "Babası", "Arkadaşı", "Sırdaşı"].map((role) => (
               <button
                 key={role}
                 onClick={() => setPetData({ ...petData, ownerRole: role })}
-                className={`px-4 py-2 rounded-full font-bold text-sm transition-all border-b-4 active:border-b-0 active:translate-y-1 ${petData.ownerRole === role
-                  ? 'bg-secondary border-teal-600 text-white'
-                  : 'bg-white dark:bg-slate-700 border-gray-200 dark:border-slate-600 text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-600'
-                  }`}
+                className={`px-4 py-2 rounded-full font-bold text-sm transition-all border-b-4 active:border-b-0 active:translate-y-1 ${
+                  petData.ownerRole === role
+                    ? "bg-secondary border-teal-600 text-white"
+                    : "bg-white dark:bg-slate-700 border-gray-200 dark:border-slate-600 text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-600"
+                }`}
               >
                 {role}
               </button>
             ))}
           </div>
-          <p className="text-right text-lg font-bold text-gray-600 dark:text-gray-400 mt-2 transition-colors duration-300">...idi.</p>
+          <p className="text-right text-lg font-bold text-gray-600 dark:text-gray-400 mt-2 transition-colors duration-300">
+            ...idi.
+          </p>
         </div>
       </Card>
     </div>
@@ -122,30 +230,51 @@ export const PetWizard: React.FC<PetWizardProps> = ({ onComplete }) => {
     <div className="space-y-6">
       <div className="text-center space-y-2">
         <h2 className="text-3xl font-heading text-primary">Bölüm 2: Tanışma</h2>
-        <p className="text-xl font-medium text-gray-600 dark:text-gray-300 transition-colors duration-300">Onun çok özel bir dostu vardı...</p>
+        <p className="text-xl font-medium text-gray-600 dark:text-gray-300 transition-colors duration-300">
+          Onun çok özel bir dostu vardı...
+        </p>
       </div>
 
       <Card className="space-y-6 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-2 border-orange-100 dark:border-slate-700 transition-colors duration-300">
         <div className="flex justify-center mb-4">
           <div className="relative">
-            <div className="w-32 h-32 rounded-full bg-background dark:bg-slate-900 border-4 border-dashed border-primary flex items-center justify-center overflow-hidden transition-colors duration-300">
-              {petData.photoUrl ? (
-                <img src={petData.photoUrl} alt="Pet" className="w-full h-full object-cover" />
+            {/*<div className="w-32 h-32 rounded-full bg-background dark:bg-slate-900 border-4 border-dashed border-primary flex items-center justify-center overflow-hidden transition-colors duration-300">
+               {petData.photoUrl ? (
+                <img
+                  src={petData.photoUrl}
+                  alt="Pet"
+                  className="w-full h-full object-cover"
+                />
               ) : (
                 <span className="text-4xl">🐾</span>
               )}
             </div>
-            <button
-              onClick={() => setPetData({ ...petData, photoUrl: 'https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=400&q=80' })}
+           <button
+              onClick={() =>
+                setPetData({
+                  ...petData,
+                  photoUrl:
+                    "https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=400&q=80",
+                })
+              }
               className="absolute bottom-0 right-0 bg-secondary text-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform"
             >
               <Camera size={20} />
-            </button>
+            </button> */}
+            <ImageUpload
+              currentPhotoUrl={petData.photoUrl}
+              storageId={"pet_photos"}
+              onPhotoChange={(url) =>
+                setPetData((prev) => ({ ...prev, photoUrl: url }))
+              }
+            />
           </div>
         </div>
 
         <div className="space-y-2 text-center">
-          <label className="text-lg font-bold text-gray-700 dark:text-gray-200 block transition-colors duration-300">Adı neydi?</label>
+          <label className="text-lg font-bold text-gray-700 dark:text-gray-200 block transition-colors duration-300">
+            Adı neydi?
+          </label>
           <input
             type="text"
             value={petData.name}
@@ -157,21 +286,23 @@ export const PetWizard: React.FC<PetWizardProps> = ({ onComplete }) => {
 
         <div className="grid grid-cols-2 gap-4">
           <button
-            onClick={() => setPetData({ ...petData, type: 'dog', breed: '' })}
-            className={`p-4 rounded-xl border-b-4 transition-all flex flex-col items-center gap-2 ${petData.type === 'dog'
-              ? 'bg-orange-100 dark:bg-orange-900/30 border-orange-300 dark:border-orange-700 text-primary'
-              : 'bg-white dark:bg-slate-700 border-gray-200 dark:border-slate-600 text-gray-400 dark:text-gray-300'
-              }`}
+            onClick={() => setPetData({ ...petData, type: "dog", breed: "" })}
+            className={`p-4 rounded-xl border-b-4 transition-all flex flex-col items-center gap-2 ${
+              petData.type === "dog"
+                ? "bg-orange-100 dark:bg-orange-900/30 border-orange-300 dark:border-orange-700 text-primary"
+                : "bg-white dark:bg-slate-700 border-gray-200 dark:border-slate-600 text-gray-400 dark:text-gray-300"
+            }`}
           >
             <Dog size={32} />
             <span className="font-bold">Köpek</span>
           </button>
           <button
-            onClick={() => setPetData({ ...petData, type: 'cat', breed: '' })}
-            className={`p-4 rounded-xl border-b-4 transition-all flex flex-col items-center gap-2 ${petData.type === 'cat'
-              ? 'bg-blue-100 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700 text-blue-500'
-              : 'bg-white dark:bg-slate-700 border-gray-200 dark:border-slate-600 text-gray-400 dark:text-gray-300'
-              }`}
+            onClick={() => setPetData({ ...petData, type: "cat", breed: "" })}
+            className={`p-4 rounded-xl border-b-4 transition-all flex flex-col items-center gap-2 ${
+              petData.type === "cat"
+                ? "bg-blue-100 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700 text-blue-500"
+                : "bg-white dark:bg-slate-700 border-gray-200 dark:border-slate-600 text-gray-400 dark:text-gray-300"
+            }`}
           >
             <Cat size={32} />
             <span className="font-bold">Kedi</span>
@@ -184,8 +315,10 @@ export const PetWizard: React.FC<PetWizardProps> = ({ onComplete }) => {
           className="w-full p-4 bg-background dark:bg-slate-900 rounded-xl border-2 border-orange-200 dark:border-slate-600 font-bold text-gray-800 dark:text-white outline-none focus:border-primary transition-colors duration-300"
         >
           <option value="">Hangi ırktan geliyordu?</option>
-          {(petData.type === 'dog' ? DOG_BREEDS : CAT_BREEDS).map(breed => (
-            <option key={breed} value={breed}>{breed}</option>
+          {(petData.type === "dog" ? DOG_BREEDS : CAT_BREEDS).map((breed) => (
+            <option key={breed} value={breed}>
+              {breed}
+            </option>
           ))}
         </select>
       </Card>
@@ -195,14 +328,20 @@ export const PetWizard: React.FC<PetWizardProps> = ({ onComplete }) => {
   const renderStep3 = () => (
     <div className="space-y-6">
       <div className="text-center space-y-2">
-        <h2 className="text-3xl font-heading text-primary">Bölüm 3: Özellikler</h2>
-        <p className="text-xl font-medium text-gray-600 dark:text-gray-300 transition-colors duration-300">O çok güçlü ve sağlıklıydı...</p>
+        <h2 className="text-3xl font-heading text-primary">
+          Bölüm 3: Özellikler
+        </h2>
+        <p className="text-xl font-medium text-gray-600 dark:text-gray-300 transition-colors duration-300">
+          O çok güçlü ve sağlıklıydı...
+        </p>
       </div>
 
       <Card className="space-y-6 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-2 border-orange-100 dark:border-slate-700 transition-colors duration-300">
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <label className="font-bold text-gray-700 dark:text-gray-200 transition-colors duration-300">Dünyaya ne zaman geldi?</label>
+            <label className="font-bold text-gray-700 dark:text-gray-200 transition-colors duration-300">
+              Dünyaya ne zaman geldi?
+            </label>
             <button
               onClick={() => setUseEstimatedAge(!useEstimatedAge)}
               className="text-xs font-bold text-primary underline"
@@ -217,21 +356,41 @@ export const PetWizard: React.FC<PetWizardProps> = ({ onComplete }) => {
                 <input
                   type="number"
                   placeholder="0"
-                  value={petData.estimatedAge?.years || ''}
-                  onChange={(e) => setPetData({ ...petData, estimatedAge: { ...petData.estimatedAge!, years: parseInt(e.target.value) || 0 } })}
+                  value={petData.estimatedAge?.years || ""}
+                  onChange={(e) =>
+                    setPetData({
+                      ...petData,
+                      estimatedAge: {
+                        ...petData.estimatedAge!,
+                        years: parseInt(e.target.value) || 0,
+                      },
+                    })
+                  }
                   className="w-full p-3 bg-background dark:bg-slate-900 rounded-xl border-2 border-orange-200 dark:border-slate-600 font-bold text-center outline-none focus:border-primary text-gray-900 dark:text-white transition-colors duration-300"
                 />
-                <span className="text-xs font-bold text-gray-400 dark:text-gray-500 text-center block mt-1 transition-colors duration-300">Yıl</span>
+                <span className="text-xs font-bold text-gray-400 dark:text-gray-500 text-center block mt-1 transition-colors duration-300">
+                  Yıl
+                </span>
               </div>
               <div className="flex-1">
                 <input
                   type="number"
                   placeholder="0"
-                  value={petData.estimatedAge?.months || ''}
-                  onChange={(e) => setPetData({ ...petData, estimatedAge: { ...petData.estimatedAge!, months: parseInt(e.target.value) || 0 } })}
+                  value={petData.estimatedAge?.months || ""}
+                  onChange={(e) =>
+                    setPetData({
+                      ...petData,
+                      estimatedAge: {
+                        ...petData.estimatedAge!,
+                        months: parseInt(e.target.value) || 0,
+                      },
+                    })
+                  }
                   className="w-full p-3 bg-background dark:bg-slate-900 rounded-xl border-2 border-orange-200 dark:border-slate-600 font-bold text-center outline-none focus:border-primary text-gray-900 dark:text-white transition-colors duration-300"
                 />
-                <span className="text-xs font-bold text-gray-400 dark:text-gray-500 text-center block mt-1 transition-colors duration-300">Ay</span>
+                <span className="text-xs font-bold text-gray-400 dark:text-gray-500 text-center block mt-1 transition-colors duration-300">
+                  Ay
+                </span>
               </div>
             </div>
           ) : (
@@ -240,7 +399,9 @@ export const PetWizard: React.FC<PetWizardProps> = ({ onComplete }) => {
               <input
                 type="date"
                 value={petData.birthday}
-                onChange={(e) => setPetData({ ...petData, birthday: e.target.value })}
+                onChange={(e) =>
+                  setPetData({ ...petData, birthday: e.target.value })
+                }
                 className="w-full pl-12 p-4 bg-background dark:bg-slate-900 rounded-xl border-2 border-orange-200 dark:border-slate-600 font-bold text-gray-800 dark:text-white outline-none focus:border-primary transition-colors duration-300"
               />
             </div>
@@ -248,7 +409,9 @@ export const PetWizard: React.FC<PetWizardProps> = ({ onComplete }) => {
         </div>
 
         <div className="space-y-2">
-          <label className="font-bold text-gray-700 dark:text-gray-200 block transition-colors duration-300">Kilosu ne kadardı?</label>
+          <label className="font-bold text-gray-700 dark:text-gray-200 block transition-colors duration-300">
+            Kilosu ne kadardı?
+          </label>
           <div className="flex gap-2">
             <div className="relative flex-1">
               <Scale className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -256,17 +419,24 @@ export const PetWizard: React.FC<PetWizardProps> = ({ onComplete }) => {
                 type="number"
                 placeholder="0.0"
                 value={petData.weight}
-                onChange={(e) => setPetData({ ...petData, weight: e.target.value })}
+                onChange={(e) =>
+                  setPetData({ ...petData, weight: e.target.value })
+                }
                 className="w-full pl-12 p-4 bg-background dark:bg-slate-900 rounded-xl border-2 border-orange-200 dark:border-slate-600 font-bold text-gray-800 dark:text-white outline-none focus:border-primary transition-colors duration-300"
               />
             </div>
             <div className="flex bg-background dark:bg-slate-900 p-1 rounded-xl border-2 border-orange-100 dark:border-slate-700 transition-colors duration-300">
-              {['kg', 'lbs'].map(unit => (
+              {["kg", "lbs"].map((unit) => (
                 <button
                   key={unit}
-                  onClick={() => setPetData({ ...petData, weightUnit: unit as 'kg' | 'lbs' })}
-                  className={`px-3 rounded-lg font-bold text-sm transition-all ${petData.weightUnit === unit ? 'bg-white dark:bg-slate-700 shadow-sm text-primary' : 'text-gray-400 dark:text-gray-500'
-                    }`}
+                  onClick={() =>
+                    setPetData({ ...petData, weightUnit: unit as "kg" | "lbs" })
+                  }
+                  className={`px-3 rounded-lg font-bold text-sm transition-all ${
+                    petData.weightUnit === unit
+                      ? "bg-white dark:bg-slate-700 shadow-sm text-primary"
+                      : "text-gray-400 dark:text-gray-500"
+                  }`}
                 >
                   {unit}
                 </button>
@@ -281,12 +451,15 @@ export const PetWizard: React.FC<PetWizardProps> = ({ onComplete }) => {
   const renderStep4 = () => (
     <div className="space-y-6">
       <div className="text-center space-y-2">
-        <h2 className="text-3xl font-heading text-primary">Bölüm 4: Dost Etiketi</h2>
-        <p className="text-xl font-medium text-gray-600 dark:text-gray-300 transition-colors duration-300">Akıllı tasmanızı eşleştirin...</p>
+        <h2 className="text-3xl font-heading text-primary">
+          Bölüm 4: Dost Etiketi
+        </h2>
+        <p className="text-xl font-medium text-gray-600 dark:text-gray-300 transition-colors duration-300">
+          Akıllı tasmanızı eşleştirin...
+        </p>
       </div>
 
       <Card className="space-y-6 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-2 border-orange-100 dark:border-slate-700 transition-colors duration-300 flex flex-col items-center text-center">
-
         <div className="relative w-48 h-48 mb-4">
           {/* Placeholder Illustration */}
           <div className="absolute inset-0 bg-orange-100 dark:bg-orange-900/20 rounded-full animate-pulse opacity-50"></div>
@@ -301,24 +474,36 @@ export const PetWizard: React.FC<PetWizardProps> = ({ onComplete }) => {
         </div>
 
         <div className="space-y-2">
-          <h3 className="text-xl font-bold text-gray-800 dark:text-white">Akıllı Tasmanızı Eşleştirin</h3>
+          <h3 className="text-xl font-bold text-gray-800 dark:text-white">
+            Akıllı Tasmanızı Eşleştirin
+          </h3>
           <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
-            Akıllı tasmanızı eşleştirmek için bir yöntem seçin. Tasmanız yok ise <a href="#" className="text-primary font-bold underline">Şimdi satın alın</a>
+            Akıllı tasmanızı eşleştirmek için bir yöntem seçin. Tasmanız yok ise{" "}
+            <a href="#" className="text-primary font-bold underline">
+              Şimdi satın alın
+            </a>
           </p>
         </div>
 
         <div className="grid grid-cols-1 gap-4 w-full max-w-xs">
-          <Button variant="primary" size="lg" className="flex items-center justify-center gap-3 py-6 text-lg shadow-lg shadow-orange-200 dark:shadow-none">
+          <Button
+            variant="primary"
+            size="lg"
+            className="flex items-center justify-center gap-3 py-6 text-lg shadow-lg shadow-orange-200 dark:shadow-none"
+          >
             <Radio size={24} />
             <span>NFC Okut</span>
           </Button>
 
-          <Button variant="secondary" size="lg" className="flex items-center justify-center gap-3 py-6 text-lg shadow-lg shadow-teal-200 dark:shadow-none">
+          <Button
+            variant="secondary"
+            size="lg"
+            className="flex items-center justify-center gap-3 py-6 text-lg shadow-lg shadow-teal-200 dark:shadow-none"
+          >
             <QrCode size={24} />
             <span>QR Kod Tara</span>
           </Button>
         </div>
-
       </Card>
     </div>
   );
@@ -326,25 +511,30 @@ export const PetWizard: React.FC<PetWizardProps> = ({ onComplete }) => {
   return (
     <div className="h-full flex flex-col relative overflow-hidden">
       {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-[0.05] dark:opacity-[0.02] pointer-events-none transition-opacity duration-300" style={{
-        backgroundImage: `radial-gradient(#FF8C42 2px, transparent 2px)`,
-        backgroundSize: '30px 30px'
-      }} />
+      <div
+        className="absolute inset-0 opacity-[0.05] dark:opacity-[0.02] pointer-events-none transition-opacity duration-300"
+        style={{
+          backgroundImage: `radial-gradient(#FF8C42 2px, transparent 2px)`,
+          backgroundSize: "30px 30px",
+        }}
+      />
 
       {/* Header */}
       <div className="pt-8 px-6 pb-4 relative z-10 flex items-center justify-between">
         <button
           onClick={handleBack}
-          className={`p-2 rounded-full hover:bg-orange-100 transition-colors ${step === 1 ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+          className={`p-2 rounded-full hover:bg-orange-100 transition-colors ${
+            step === 1 ? "opacity-0 pointer-events-none" : "opacity-100"
+          }`}
         >
           <ArrowLeft className="w-8 h-8 text-primary" strokeWidth={3} />
         </button>
-
         <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-soft">
           <BookOpen className="w-5 h-5 text-primary" />
-          <span className="font-heading font-bold text-gray-600">Sayfa {step} / {totalSteps}</span>
+          <span className="font-heading font-bold text-gray-600">
+            Sayfa {step} / {totalSteps}
+          </span>
         </div>
-
         <div className="w-12" /> {/* Spacer */}
       </div>
 
@@ -360,7 +550,7 @@ export const PetWizard: React.FC<PetWizardProps> = ({ onComplete }) => {
             exit="exit"
             transition={{
               x: { type: "spring", stiffness: 300, damping: 30 },
-              opacity: { duration: 0.2 }
+              opacity: { duration: 0.2 },
             }}
             className="w-full h-full py-4"
           >
@@ -381,11 +571,14 @@ export const PetWizard: React.FC<PetWizardProps> = ({ onComplete }) => {
           onClick={handleNext}
           className="text-xl flex items-center justify-center gap-2"
         >
-          {step === totalSteps ? 'Hikayeyi Başlat ✨' : 'Sonraki Sayfa'}
+          {step === totalSteps ? "Hikayeyi Başlat ✨" : "Sonraki Sayfa"}
           {step !== totalSteps && <ChevronRight size={24} strokeWidth={3} />}
         </Button>
         {step === totalSteps && (
-          <button onClick={onComplete} className="w-full text-center mt-4 text-gray-400 dark:text-gray-500 font-bold text-sm hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+          <button
+            onClick={onComplete}
+            className="w-full text-center mt-4 text-gray-400 dark:text-gray-500 font-bold text-sm hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+          >
             Şimdilik Atla
           </button>
         )}
