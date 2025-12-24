@@ -34,6 +34,7 @@ import LoadingScreen from "@/components/LoadingScreen";
 import { useNavigate } from "react-router-dom";
 import { Modal } from "@/components/Modal";
 import { getAiResponsesByUserId } from "@/services/supabase/ai_responses.service";
+import { supabase } from "@/lib/supabase";
 
 export const ProfileScreen: React.FC = () => {
   const navigate = useNavigate();
@@ -65,6 +66,47 @@ export const ProfileScreen: React.FC = () => {
         alert("Rapor indirildi: barnaby_health_report.pdf");
       }
     }, 2000);
+  };
+
+  // const logoutFromMobile = (e) => {
+  //   e.preventDefault();
+  //   localStorage.removeItem("supabase_access_token");
+  //   localStorage.removeItem("supabase_refresh_token");
+  //   localStorage.removeItem("supabase_user");
+
+  //   supabase.auth.signOut();
+
+  //   if (window.ReactNativeWebView) {
+  //     window.ReactNativeWebView.postMessage(
+  //       JSON.stringify({
+  //         type: "logout",
+  //       })
+  //     );
+  //   }
+  // };
+
+  const logoutFromMobile = (e) => {
+    e.preventDefault();
+
+    console.log("🔴 Logout clicked");
+    console.log("🔴 ReactNativeWebView exists:", !!window.ReactNativeWebView);
+
+    localStorage.removeItem("supabase_access_token");
+    localStorage.removeItem("supabase_refresh_token");
+    localStorage.removeItem("supabase_user");
+
+    supabase.auth.signOut();
+
+    if (window.ReactNativeWebView) {
+      console.log("🔴 Sending logout message to mobile");
+      window.ReactNativeWebView.postMessage(
+        JSON.stringify({
+          type: "logout",
+        })
+      );
+    } else {
+      console.log("🔴 No ReactNativeWebView found - running in browser");
+    }
   };
 
   const handleGetUserData = async () => {
@@ -367,7 +409,10 @@ export const ProfileScreen: React.FC = () => {
 
       {/* Logout */}
       <div className="px-6 pt-4 text-center">
-        <button className="text-red-500 font-bold text-sm flex items-center justify-center mx-auto hover:bg-red-50 dark:hover:bg-red-900/20 px-4 py-2 rounded-xl transition-colors duration-300">
+        <button
+          onClick={logoutFromMobile}
+          className="text-red-500 font-bold text-sm flex items-center justify-center mx-auto hover:bg-red-50 dark:hover:bg-red-900/20 px-4 py-2 rounded-xl transition-colors duration-300"
+        >
           <LogOut className="w-4 h-4 mr-2" /> Çıkış Yap
         </button>
         <p className="text-[10px] text-gray-300 dark:text-gray-600 mt-4 transition-colors duration-300">

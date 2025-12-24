@@ -180,28 +180,45 @@ export default function WebViewScreen() {
     };
   }, [session?.user?.id]);
 
-  const handleLogout = () => {
-    Alert.alert("Logout", "Are you sure you want to logout?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Logout",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            await signOut();
-          } catch (error) {
-            Alert.alert("Error", error.message);
-          }
-        },
-      },
-    ]);
+  // const handleLogout = () => {
+  //   Alert.alert("Logout", "Are you sure you want to logout?", [
+  //     { text: "Cancel", style: "cancel" },
+  //     {
+  //       text: "Logout",
+  //       style: "destructive",
+  //       onPress: async () => {
+  //         try {
+  //           await signOut();
+  //         } catch (error) {
+  //           Alert.alert("Error", error.message);
+  //         }
+  //       },
+  //     },
+  //   ]);
+  // };
+
+  const handleLogout = async () => {
+    try {
+      console.log("hhhehehe");
+      await signOut();
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    }
   };
 
   const handleWebViewMessage = (event) => {
+    console.log("📨 Raw message received:", event.nativeEvent.data);
+
     try {
       const message = JSON.parse(event.nativeEvent.data);
+      console.log("📨 Parsed message:", message);
 
       switch (message.type) {
+        case "logout":
+          console.log("🚪 Logout message received");
+
+          handleLogout();
+          break;
         case "console.log":
           console.log("[🌐 WebView]", ...message.data);
           break;

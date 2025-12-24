@@ -39,6 +39,7 @@ import {
   isUserExist,
 } from "./services/supabase/user_details.service";
 import { usePet } from "./contexts/PetContext";
+import LoadingScreen from "./components/LoadingScreen";
 
 type ViewState =
   | "WELCOME"
@@ -87,7 +88,7 @@ const AppContent: React.FC = () => {
     };
   }, []);
 
-  if (!ready) return <div>Yükleniyor...</div>;
+  if (!ready) return <LoadingScreen />;
 
   const navigate = (screen: ViewState, params?: any) => {
     if (params) setViewParams(params);
